@@ -26,7 +26,7 @@ $form = $error !== '' ? ['id_triangulo' => $_POST['id_triangulo'] ?? '', 'cateto
 <body>
 <header class="headeerHome">
     <div class="lineaSup">
-        <div class="logo"><img src="../imagenes/triangulo.svg" alt="Triángulo rectángulo"><h1>Triángulo rectángulo</h1></div>
+        <div class="logo"><img src="../imagenes/marca.svg" alt=""><div><h1>Triángulo rectángulo</h1><small>Geometría a tu manera</small></div></div>
         <p>Usuario: <?= e($_SESSION['usuario']) ?></p>
     </div>
     <div class="lineaInf"><nav class="menu" aria-label="Principal">
@@ -35,18 +35,19 @@ $form = $error !== '' ? ['id_triangulo' => $_POST['id_triangulo'] ?? '', 'cateto
     </nav></div>
 </header>
 <main>
+    <div class="page-intro"><div><span class="eyebrow">TU ESPACIO DE CÁLCULO</span><h1>Dos catetos.<br>Todo resuelto.</h1><p>Calcula, guarda y lleva el control de tus resultados.</p></div><span class="intro-tag">a² + b² = c²</span></div>
     <section class="datos">
-        <div class="titulo"><h1>Área y perímetro del triángulo rectángulo</h1>
+        <div class="titulo"><h2>Calculadora de triángulo rectángulo</h2>
         <p>Ingresa los dos catetos en la misma unidad.</p></div>
-        <div class="explicacion"><img src="../imagenes/triangulo.svg" alt="Cateto a horizontal, cateto b vertical e hipotenusa c">
-        <p>c = √(a² + b²)<br>Área = (a × b) / 2<br>Perímetro = a + b + c</p></div>
+        <div class="explicacion"><div class="diagram-heading"><span>Conoce tu triángulo</span><span>90°</span></div><img src="../imagenes/triangulo.svg" alt="Cateto a horizontal, cateto b vertical e hipotenusa c">
+        <p><span class="formula"><span>Hipotenusa</span>c = √(a² + b²)</span><span class="formula"><span>Área</span>(a × b) / 2</span><span class="formula"><span>Perímetro</span>a + b + c</span></p><small class="diagram-note">a y b son los catetos · c es la hipotenusa</small></div>
         <?php if ($mensaje !== ''): ?><p class="mensaje" role="status"><?= e($mensaje) ?></p><?php endif; ?>
         <form method="post" class="form2" id="frmFormulario">
             <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>">
             <input type="hidden" name="id_triangulo" value="<?= e($form['id_triangulo'] ?? '') ?>">
             <?php foreach (['a' => 'A (base)', 'b' => 'B (altura)'] as $letra => $etiqueta): ?>
             <div class="inputs"><label for="txtCateto<?= strtoupper($letra) ?>">Cateto <?= $etiqueta ?></label>
-            <input class="inputHome" type="number" step="any" min="0.000000001" max="1000000000" required
+            <input class="inputHome" type="number" step="any" min="0" max="1000000000" required
                 name="txtCateto<?= strtoupper($letra) ?>" id="txtCateto<?= strtoupper($letra) ?>"
                 placeholder="Ejemplo: <?= $letra === 'a' ? '3' : '4' ?>" value="<?= e($form['cateto_' . $letra] ?? '') ?>"></div>
             <?php endforeach; ?>
@@ -63,7 +64,7 @@ $form = $error !== '' ? ['id_triangulo' => $_POST['id_triangulo'] ?? '', 'cateto
         <label for="txtBuscar">Buscar</label><input type="search" name="buscar" id="txtBuscar" placeholder="Comentario o medida" value="<?= e($buscar) ?>">
         <button type="submit">Buscar</button><a class="btn-link" href="home.php">Limpiar</a>
     </form></section>
-    <section class="tabla" id="historial"><h2>Historial de cálculos</h2>
+    <section class="tabla" id="historial"><div class="table-heading"><h2>Tu historial de cálculos</h2><span class="record-count"><?= count($registros) ?> registros<?= $buscar !== '' ? ' encontrados' : '' ?></span></div>
     <div class="tabla-scroll"><table>
         <thead><tr><th>ID</th><th>Cateto A</th><th>Cateto B</th><th>Hipotenusa</th><th>Área</th><th>Perímetro</th><th>Comentario</th><th>Fecha y hora</th><th>Acciones</th></tr></thead>
         <tbody>
@@ -81,6 +82,7 @@ $form = $error !== '' ? ['id_triangulo' => $_POST['id_triangulo'] ?? '', 'cateto
         <?php if (!$registros): ?><tr><td colspan="9">No hay registros para mostrar.</td></tr><?php endif; ?>
         </tbody>
     </table></div></section>
+<footer class="page-footer"><span>Triángulo rectángulo · Tu espacio de geometría</span><span>Calcula. Guarda. Sigue.</span></footer>
 </main>
 <script src="../assetes/js/app.js"></script>
 </body></html>

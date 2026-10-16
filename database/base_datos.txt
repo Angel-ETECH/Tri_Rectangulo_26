@@ -22,5 +22,5 @@ CREATE TABLE IF NOT EXISTS triangulo (
 
 -- Acceso inicial local: admin@triangulo.com / 123
 INSERT INTO usuario (nombre, correo, clave)
-SELECT 'Administrador', 'admin@triangulo.com', '123'
+SELECT 'Administrador', 'admin@triangulo.com', '$2y$10$2hY23xrMMq2jpW5NUclkY.tdLZpHOuNDoVof1x46lU4RupLQ7134S'
 WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE correo = 'admin@triangulo.com');

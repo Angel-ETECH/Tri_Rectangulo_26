@@ -9,6 +9,7 @@ class AuthController
         $usuario = $usuarioModel->login($correo, $clave);
 
         if ($usuario) {
+            session_regenerate_id(true);
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['usuario'] = $usuario['nombre'] ?: $usuario['correo'];
             $_SESSION['correo'] = $usuario['correo'];
