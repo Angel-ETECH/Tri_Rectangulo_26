@@ -1,0 +1,131 @@
+/*======================*/
+/*   Login - Pastel     */
+/*======================*/
+:root{
+    --fondo: #f7f3ea;
+    --fondo-2: #eef7f2;
+    --tarjeta: #fffaf3;
+    --primario: #b8a7e6;
+    --primario-oscuro: #826fc0;
+    --secundario: #bdebd6;
+    --acento: #ffd6ba;
+    --texto: #3f3d56;
+    --texto-suave: #6f6a80;
+    --borde: #e3d8f2;
+    --blanco: #ffffff;
+    --sombra: 0 18px 35px rgba(63, 61, 86, 0.14);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    min-height: 100vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: var(--texto);
+    background:
+        radial-gradient(circle at top left, rgba(184, 167, 230, 0.35), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(189, 235, 214, 0.45), transparent 35%),
+        var(--fondo);
+}
+
+.caja{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 25px;
+}
+
+.caja form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: min(430px, 92%);
+    min-height: 500px;
+    padding: 35px 30px;
+    border: 1px solid var(--borde);
+    border-radius: 28px;
+    background: rgba(255, 250, 243, 0.92);
+    box-shadow: var(--sombra);
+}
+
+form img{
+    width: 165px;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 8px 12px rgba(63, 61, 86, 0.10));
+}
+
+form input{
+    width: 100%;
+    height: 55px;
+    font-size: 20px;
+    border: 1px solid transparent;
+    background-color: var(--fondo-2);
+    color: var(--texto);
+    border-radius: 14px;
+    margin-bottom: 18px;
+    padding-left: 16px;
+    outline: none;
+    transition: 0.25s ease;
+}
+
+form input::placeholder{
+    color: var(--texto-suave);
+}
+
+form input:focus{
+    border-color: var(--primario);
+    background-color: var(--blanco);
+    box-shadow: 0 0 0 4px rgba(184, 167, 230, 0.20);
+}
+
+form button{
+    width: 100%;
+    height: 55px;
+    background: linear-gradient(135deg, var(--primario), var(--primario-oscuro));
+    color: var(--blanco);
+    border: 0;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+form button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(130, 111, 192, 0.25);
+}
+
+form button:active{
+    transform: translateY(0);
+}
+
+/* Medias para login */
+@media (max-width: 976px){
+    .caja form{
+        width: min(520px, 80%);
+    }
+}
+
+@media (max-width: 760px){
+    .caja form{
+        width: 94%;
+        padding: 28px 22px;
+    }
+
+    form img{
+        width: 135px;
+    }
+
+    form input,
+    form button{
+        height: 50px;
+        font-size: 18px;
+    }
+}

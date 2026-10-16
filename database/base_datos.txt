@@ -1,0 +1,29 @@
+-- Estructura reconstruida a partir del código PHP del proyecto.
+-- No contiene registros históricos eliminados.
+CREATE DATABASE IF NOT EXISTS `cuadrado_db2`   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `cuadrado_db2`;
+
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id_usuario` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(150) NOT NULL DEFAULT '',
+  `correo` VARCHAR(255) NOT NULL,
+  `clave` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `uq_usuario_correo` (`correo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cuadrado` (
+  `id_cuadrado` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `detalle` TEXT NULL,
+  `lado` DOUBLE NOT NULL,
+  `area` DOUBLE NOT NULL,
+  `perimetro` DOUBLE NOT NULL,
+  `fecha_registro` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_cuadrado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Usuario inicial: cambiar esta contraseña después de ingresar.
+-- El código PHP actual admite contraseñas simples y hashes de password_hash().
+INSERT INTO `usuario` (`nombre`, `correo`, `clave`)
+SELECT 'Administrador', 'admin@cuadrado', '123'
+WHERE NOT EXISTS (SELECT 1 FROM `usuario` WHERE `correo` = 'admin@cuadrado');
