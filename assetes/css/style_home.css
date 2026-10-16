@@ -509,3 +509,23 @@ table tbody tr:hover{
         min-width: 620px;
     }
 }
+
+/* Ajustes de la calculadora de triangulos */
+.menu > a { padding: 14px 22px; color: var(--texto); text-decoration: none; }
+.menu > a:hover { background: rgba(255,255,255,.5); border-radius: 12px; }
+.explicacion { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 8px 0 20px; line-height: 1.8; }
+.explicacion img { width: 160px; }
+.mensaje { padding: 12px 18px; background: #e4ddf5; border-radius: 12px; margin: 12px 0; }
+.btn-link, .btn-tabla { display: inline-block; padding: 11px 18px; border-radius: 12px; text-decoration: none; background: var(--acento); color: var(--texto); text-align: center; }
+.btn-tabla { font: inherit; border: 0; cursor: pointer; padding: 8px 12px; }
+.editar { background: var(--secundario); }
+.eliminar { background: #f8c7c7; }
+.acciones { display: flex; gap: 8px; align-items: center; }
+.tabla h2 { margin-bottom: 18px; }
+.tabla-scroll { width: 100%; overflow-x: auto; }
+.tabla table { width: 100%; min-width: 950px; }
+.tabla td { overflow-wrap: anywhere; max-width: 220px; }
+#avisoCalculo { color: #575268; line-height: 1.5; }
+input[readonly] { font-weight: 600; }
+.botones button:nth-child(3), .buscar form button { background: #7560ae; }
+@media(max-width:786px) { .menu { flex-direction: row; flex-wrap: wrap; padding: 8px; } .menu > a { padding: 10px; } .botones .btn-link { width: 100%; } .explicacion { gap: 12px; } .explicacion img { width: 120px; } }

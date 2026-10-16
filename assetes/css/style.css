@@ -129,3 +129,8 @@ form button:active{
         font-size: 18px;
     }
 }
+
+.caja form h1 { font-size: 25px; text-align: center; margin-bottom: 10px; }
+.caja form p { text-align: center; margin-bottom: 18px; }
+.caja form label { align-self: flex-start; margin-bottom: 7px; }
+.mensaje { color: #8a2424; background: #ffe2e2; padding: 12px; border-radius: 10px; }
