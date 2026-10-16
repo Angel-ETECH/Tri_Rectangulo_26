@@ -1,185 +1,86 @@
 <?php
 session_start();
 require_once __DIR__ . '/../controller/AuthController.php';
-require_once __DIR__ . '/../controller/CuadradoController.php';
-
+require_once __DIR__ . '/../controller/TrianguloController.php';
 AuthController::verificarSesion();
-
-$cuadradoController = new CuadradoController();
-$mensaje = $_GET['mensaje'] ?? '';
-$mensajeFormulario = $cuadradoController->procesarFormulario();
-
-if ($mensajeFormulario !== '') {
-    $mensaje = $mensajeFormulario;
-}
-
+$_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+$controller = new TrianguloController();
+$error = $controller->procesarFormulario();
+$mensajes = ['guardado' => 'Triángulo guardado.', 'actualizado' => 'Triángulo actualizado.', 'eliminado' => 'Registro eliminado.'];
+$mensaje = $error ?: ($mensajes[$_GET['mensaje'] ?? ''] ?? '');
 $buscar = trim($_GET['buscar'] ?? '');
-$registroEditar = null;
-
-if (isset($_GET['editar'])) {
-    $registroEditar = $cuadradoController->obtenerParaEditar((int) $_GET['editar']);
-}
-
-$registros = $cuadradoController->listar($buscar);
-
-$idActual = $registroEditar['id_cuadrado'] ?? '';
-$ladoActual = $registroEditar['lado'] ?? '';
-$detalleActual = $registroEditar['detalle'] ?? '';
-$areaActual = $registroEditar['area'] ?? '';
-$perimetroActual = $registroEditar['perimetro'] ?? '';
+$editar = $controller->obtenerParaEditar((int) ($_GET['editar'] ?? 0));
+$registros = $controller->listar($buscar);
+function e($valor): string { return htmlspecialchars((string) ($valor ?? ''), ENT_QUOTES, 'UTF-8'); }
+$form = $error !== '' ? ['id_triangulo' => $_POST['id_triangulo'] ?? '', 'cateto_a' => $_POST['txtCatetoA'] ?? '', 'cateto_b' => $_POST['txtCatetoB'] ?? '', 'detalle' => $_POST['txtDetalle'] ?? ''] : ($editar ?? []);
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="index,follow">
-    <meta name="description" content="Calculo del area y perimetro del cuadrado">
-    <meta name="keywords" content="cuadrado, sistema, base de datos">
-    <meta name="author" content="BC TECH">
-
-    <link rel="icon" href="../imagenes/icono.png">
+    <title>Triángulo rectángulo | Calculadora e historial</title>
+    <link rel="icon" href="../imagenes/triangulo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../assetes/css/style_home.css">
-
-    <title>cuadrado-principal</title>
 </head>
 <body>
-    <header class="headeerHome">
-        <div class="lineaSup">
-            <div class="logo-links">
-                <div class="logo">
-                    <img src="../imagenes/logo.png" alt="">
-                    <h1>Matemáticas</h1>
-                </div>               
-                <a href="">Quienes somos</a>
-            </div>
-            <div class="buscarHeader" >
-                <form class="form1">
-                    <img src="../imagenes/logo.png" alt="imagen de buscar">
-                    <button type="submit">Buscar</button>
-                    <input type="text"  name="buscar" id="txtBuscar" placeholder="BUSCAR"
-                    value="<?php echo htmlspecialchars($buscar); ?>">
+<header class="headeerHome">
+    <div class="lineaSup">
+        <div class="logo"><img src="../imagenes/triangulo.svg" alt="Triángulo rectángulo"><h1>Triángulo rectángulo</h1></div>
+        <p>Usuario: <?= e($_SESSION['usuario']) ?></p>
+    </div>
+    <div class="lineaInf"><nav class="menu" aria-label="Principal">
+        <a href="home.php">Calculadora</a><a href="#historial">Historial</a>
+        <a href="logout.php" onclick="return confirm('¿Desea cerrar sesión?');">Cerrar sesión</a>
+    </nav></div>
+</header>
+<main>
+    <section class="datos">
+        <div class="titulo"><h1>Área y perímetro del triángulo rectángulo</h1>
+        <p>Ingresa los dos catetos en la misma unidad.</p></div>
+        <div class="explicacion"><img src="../imagenes/triangulo.svg" alt="Cateto a horizontal, cateto b vertical e hipotenusa c">
+        <p>c = √(a² + b²)<br>Área = (a × b) / 2<br>Perímetro = a + b + c</p></div>
+        <?php if ($mensaje !== ''): ?><p class="mensaje" role="status"><?= e($mensaje) ?></p><?php endif; ?>
+        <form method="post" class="form2" id="frmFormulario">
+            <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>">
+            <input type="hidden" name="id_triangulo" value="<?= e($form['id_triangulo'] ?? '') ?>">
+            <?php foreach (['a' => 'A (base)', 'b' => 'B (altura)'] as $letra => $etiqueta): ?>
+            <div class="inputs"><label for="txtCateto<?= strtoupper($letra) ?>">Cateto <?= $etiqueta ?></label>
+            <input class="inputHome" type="number" step="any" min="0.000000001" max="1000000000" required
+                name="txtCateto<?= strtoupper($letra) ?>" id="txtCateto<?= strtoupper($letra) ?>"
+                placeholder="Ejemplo: <?= $letra === 'a' ? '3' : '4' ?>" value="<?= e($form['cateto_' . $letra] ?? '') ?>"></div>
+            <?php endforeach; ?>
+            <div class="inputs"><label for="txtDetalle">Comentario</label><input class="inputHome" type="text" maxlength="500" name="txtDetalle" id="txtDetalle" placeholder="Opcional" value="<?= e($form['detalle'] ?? '') ?>"></div>
+            <?php foreach (['H' => 'Hipotenusa', 'A' => 'Área', 'P' => 'Perímetro'] as $id => $label): ?>
+            <div class="inputs"><label for="txt<?= $id ?>"><?= $label ?></label><input class="inputHome" id="txt<?= $id ?>" type="text" readonly placeholder="<?= $label ?>"></div>
+            <?php endforeach; ?>
+            <p id="avisoCalculo" role="status">Los resultados se calculan al ingresar los catetos.</p>
+            <div class="botones"><button type="button" id="btnCalcular">Calcular</button><a class="btn-link cancelar" href="home.php">Cancelar</a>
+            <button type="submit" name="accion" value="guardar"><?= !empty($form['id_triangulo']) ? 'Actualizar' : 'Guardar' ?></button></div>
+        </form>
+    </section>
+    <section class="buscar" aria-label="Buscar registros"><form action="home.php" method="get">
+        <label for="txtBuscar">Buscar</label><input type="search" name="buscar" id="txtBuscar" placeholder="Comentario o medida" value="<?= e($buscar) ?>">
+        <button type="submit">Buscar</button><a class="btn-link" href="home.php">Limpiar</a>
+    </form></section>
+    <section class="tabla" id="historial"><h2>Historial de cálculos</h2>
+    <div class="tabla-scroll"><table>
+        <thead><tr><th>ID</th><th>Cateto A</th><th>Cateto B</th><th>Hipotenusa</th><th>Área</th><th>Perímetro</th><th>Comentario</th><th>Fecha y hora</th><th>Acciones</th></tr></thead>
+        <tbody>
+        <?php foreach ($registros as $fila): ?><tr>
+            <td><?= e($fila['id_triangulo']) ?></td>
+            <?php foreach (['cateto_a', 'cateto_b', 'hipotenusa', 'area', 'perimetro'] as $campo): ?><td><?= e(number_format((float) $fila[$campo], 2, '.', '')) ?></td><?php endforeach; ?>
+            <td><?= e($fila['detalle']) ?></td><td><?= e($fila['fecha_registro']) ?></td>
+            <td class="acciones"><a class="btn-tabla editar" href="home.php?editar=<?= (int) $fila['id_triangulo'] ?>">Editar</a>
+                <form method="post" onsubmit="return confirm('¿Desea eliminar este registro?');">
+                    <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>">
+                    <input type="hidden" name="id_triangulo" value="<?= (int) $fila['id_triangulo'] ?>">
+                    <button class="btn-tabla eliminar" type="submit" name="accion" value="eliminar">Eliminar</button>
                 </form>
-            </div>
-        </div>
-        <div class="lineaInf">
-            <nav class="menu">
-                <li>
-                    <a href="#">Inicio</a>
-                </li>
-                <li>
-                    <a href="">Nuestra hisotiria</a>
-                </li>
-                <li>
-                    <a href="logout.php" onclick="return cinfirm('desea salir?');">Cerrar seseion</a>
-                </li>
-            </nav>
-        </div>
-    </header>
-
-    
-    <main>
-        <div class="datos">
-            <div class="titulo">
-                <h1>Calculo del area y perimetro del cuadrado</h1>
-                <p>Usuario: <?php echo htmlspecialchars($_SESSION['usuario']); ?></p>
-            </div>
-
-            <?php if ($mensaje !== '') : ?>
-                <p class="mensaje">
-                    <?php echo htmlspecialchars(ucfirst($mensaje)); ?>
-                </p>
-            <?php endif; ?>
-
-
-            <form action="" method="post" class="form2" id="frmFormulario">
-                <input type="hidden" name="id_cuadrado" value="<?php echo htmlspecialchars($idActual); ?>">
-
-                <div class="inputs">
-                    <label for="lado">Lado</label>
-                    <input class="inputHome"type="decimal" name="txtLado" id="txtLado" placeholder="Lado"
-                     value="<?php echo htmlspecialchars($ladoActual); ?>">
-                </div>
-                <div class="inputs">
-                    <label for="comentario">Comentario</label>
-                    <input class="inputHome" type="text" placeholder="Opcional: Un comentario"
-                    name="txtDetalle" id="txtDetalle" value="<?php echo htmlspecialchars($detalleActual); ?>">
-                </div>
-                <div class="inputs">
-                    <label for="area">Area</label>
-                    <input class="inputHome" type="text" name="txtA" id="txtA" readonly placeholder="Area"
-                     value="<?php echo htmlspecialchars($areaActual); ?>">
-                </div>
-                <div class="inputs">
-                    <label for="area">Perímetro</label>
-                    <input class="inputHome" type="text" name="txtP" id="txtP" readonly placeholder="Perimetro"
-                     value="<?php echo htmlspecialchars($perimetroActual); ?>">
-                </div>
-                <div class="botones">
-                    <button type="button" onclick="calcularCuadrado();">Calcular</button>
-                    <a class="btn-link cancelar" href="home.php">Cancelar</a>
-                    <button type="submit" name="accion" value="guardar">
-                        <?php echo $idActual !== '' ? 'Actualizar' : 'Guardar'; ?>
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="buscar">
-            <form action="home.php" method="get" id="frmBuscar">
-                <img src="../imagenes/logo.png" alt="imagen de buscar">
-                <button type="submit">Buscar</button>
-                <input type="text" name="buscar" id="txtBuscar" placeholder="Buscar por lado"
-                 value="<?php echo htmlspecialchars($buscar); ?>">
-                <a class="btn-link limpiar" href="home.php">Limpiar</a>
-            </form>
-        </div>
-
-        <div class="tabla">
-            <h1>Historial de los calculos</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>lado</th>
-                        <th>Detalle</th>
-                        <th>Area</th>
-                        <th>Perimetro</th>
-                        <th>Fecha y hora</th>
-                        <th>Botones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (count($registros) > 0) : ?>
-                        <?php foreach ($registros as $fila) : ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($fila['id_cuadrado']); ?></td>
-                                <td><?php echo htmlspecialchars($fila['lado']); ?></td>
-                                <td><?php echo htmlspecialchars($fila['detalle']); ?></td>
-                                <td><?php echo htmlspecialchars($fila['area']); ?></td>
-                                <td><?php echo htmlspecialchars($fila['perimetro']); ?></td>
-                                <td><?php echo htmlspecialchars($fila['fecha_registro']); ?></td>
-                                <td class="acciones">
-                                    <a class="btn-tabla editar" href="home.php?editar=<?php echo (int) $fila['id_cuadrado']; ?>">Editar</a>
-
-                                    <form action="" method="post" onsubmit="return confirm('¿Desea eliminar este registro?');">
-                                        <input type="hidden" name="id_cuadrado" value="<?php echo (int) $fila['id_cuadrado']; ?>">
-                                        <button class="btn-tabla eliminar" type="submit" name="accion" value="eliminar">Eliminar</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <tr>
-                            <td colspan="7">No hay registros para mostrar.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            
-        </div>
-    </main>
-
-    <script src="../assetes/js/app.js?v=2"></script>
-</body>
-</html>
+            </td></tr><?php endforeach; ?>
+        <?php if (!$registros): ?><tr><td colspan="9">No hay registros para mostrar.</td></tr><?php endif; ?>
+        </tbody>
+    </table></div></section>
+</main>
+<script src="../assetes/js/app.js"></script>
+</body></html>
